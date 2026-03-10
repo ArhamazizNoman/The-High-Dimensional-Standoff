@@ -1,0 +1,5 @@
+model,cleaning,train_file,test_file,cv_rmse_mean,cv_rmse_std
+lasso,clean1_median,data_clean/clean_1_median_train_standardized.csv,data_clean/clean_1_median_test_standardized.csv,32.5577460386523,6.3698352795161695
+lasso,clean2_knn,data_clean/clean_2_knn_train_standardized.csv,data_clean/clean_2_knn_test_standardized.csv,26.79109694765439,5.627294392965974
+lasso,clean3_model,data_clean/clean_3_model_train_standardized.csv,data_clean/clean_3_model_test_standardized.csv,22.057988137760425,4.334583745031411
+lasso,clean4_mean,data_clean/clean_4_mean_train_standardized.csv,data_clean/clean_4_mean_test_standardized.csv,33.62573751920772,4.800698991972141

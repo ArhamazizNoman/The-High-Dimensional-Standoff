@@ -1,0 +1,5 @@
+model,cleaning,train_file,test_file,cv_rmse_mean,cv_rmse_std
+random_forest,clean1_median,C:\Users\carra\OneDrive\Desktop\The-High-Dimensional-Standoff\data_clean\clean_1_median_train.csv,C:\Users\carra\OneDrive\Desktop\The-High-Dimensional-Standoff\data_clean\clean_1_median_test.csv,57.89350095274868,15.415268669187062
+random_forest,clean2_knn,C:\Users\carra\OneDrive\Desktop\The-High-Dimensional-Standoff\data_clean\clean_2_knn_train.csv,C:\Users\carra\OneDrive\Desktop\The-High-Dimensional-Standoff\data_clean\clean_2_knn_test.csv,56.79384838180589,15.854801332335212
+random_forest,clean3_model,C:\Users\carra\OneDrive\Desktop\The-High-Dimensional-Standoff\data_clean\clean_3_model_train.csv,C:\Users\carra\OneDrive\Desktop\The-High-Dimensional-Standoff\data_clean\clean_3_model_test.csv,55.20337993560936,15.334197000891013
+random_forest,clean4_mean,C:\Users\carra\OneDrive\Desktop\The-High-Dimensional-Standoff\data_clean\clean_4_mean_train.csv,C:\Users\carra\OneDrive\Desktop\The-High-Dimensional-Standoff\data_clean\clean_4_mean_test.csv,57.66863139369974,15.297331583718904
