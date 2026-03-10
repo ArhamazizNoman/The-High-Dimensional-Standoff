@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
 
@@ -10,13 +11,25 @@ os.makedirs("data_reduced", exist_ok=True)
 
 
 # =====================================
-# Datasets to process
+# Standardized datasets to process
 # =====================================
 datasets = [
-    ("data_clean/clean_1_X_train.csv", "data_clean/clean_1_X_test.csv"),
-    ("data_clean/clean_2_knn_train.csv", "data_clean/clean_2_knn_test.csv"),
-    ("data_clean/clean_3_model_train.csv", "data_clean/clean_3_model_test.csv"),
-    ("data_clean/clean_4_median_train.csv", "data_clean/clean_4_median_test.csv"),
+    (
+        "data_clean/clean_1_median_train_standardized.csv",
+        "data_clean/clean_1_median_test_standardized.csv"
+    ),
+    (
+        "data_clean/clean_2_knn_train_standardized.csv",
+        "data_clean/clean_2_knn_test_standardized.csv"
+    ),
+    (
+        "data_clean/clean_3_model_train_standardized.csv",
+        "data_clean/clean_3_model_test_standardized.csv"
+    ),
+    (
+        "data_clean/clean_4_mean_train_standardized.csv",
+        "data_clean/clean_4_mean_test_standardized.csv"
+    ),
 ]
 
 
@@ -30,9 +43,9 @@ for train_path, test_path in datasets:
     train_name = os.path.basename(train_path)
     test_name = os.path.basename(test_path)
 
-    print(f"Running PCA for {train_name}")
+    print(f"Running PCA for: {train_name}")
 
-    # Load data
+    # Load standardized data
     X_train = pd.read_csv(train_path)
     X_test = pd.read_csv(test_path)
 
@@ -40,19 +53,32 @@ for train_path, test_path in datasets:
     print("Test shape :", X_test.shape)
 
     # ---------------------------------
-    # Fit PCA on TRAIN
+    # Fit PCA on training data
     # ---------------------------------
-    pca = PCA()
-    pca.fit(X_train)
+    pca_full = PCA()
+    pca_full.fit(X_train)
 
-    # Choose number of components explaining 95% variance
-    cumulative_variance = pca.explained_variance_ratio_.cumsum()
+    cumulative_variance = pca_full.explained_variance_ratio_.cumsum()
+
+    # Select number of components for 95% explained variance
     n_components = (cumulative_variance >= 0.95).argmax() + 1
 
-    print("Selected components:", n_components)
+    print("Selected number of components:", n_components)
+    print("Explained variance:", cumulative_variance[n_components-1])
 
     # ---------------------------------
-    # Fit PCA with optimal components
+    # Scree Plot (variance explained)
+    # ---------------------------------
+    plt.figure(figsize=(6,4))
+    plt.plot(cumulative_variance)
+    plt.axhline(y=0.95)
+    plt.xlabel("Number of components")
+    plt.ylabel("Cumulative explained variance")
+    plt.title(f"Scree Plot - {train_name}")
+    plt.show()
+
+    # ---------------------------------
+    # Fit PCA with selected components
     # ---------------------------------
     pca = PCA(n_components=n_components)
 
@@ -60,7 +86,7 @@ for train_path, test_path in datasets:
     X_test_pca = pca.transform(X_test)
 
     # ---------------------------------
-    # Convert to DataFrame
+    # Convert back to DataFrame
     # ---------------------------------
     columns = [f"PC{i+1}" for i in range(n_components)]
 
@@ -68,10 +94,10 @@ for train_path, test_path in datasets:
     X_test_pca = pd.DataFrame(X_test_pca, columns=columns)
 
     # ---------------------------------
-    # Save results with correct names
+    # Save in data_reduced with prefix PCA_
     # ---------------------------------
-    train_output = f"data_reduced/pca_{train_name}"
-    test_output = f"data_reduced/pca_{test_name}"
+    train_output = os.path.join("data_reduced", f"PCA_{train_name}")
+    test_output = os.path.join("data_reduced", f"PCA_{test_name}")
 
     X_train_pca.to_csv(train_output, index=False)
     X_test_pca.to_csv(test_output, index=False)
