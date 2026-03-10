@@ -19,6 +19,12 @@ print("\nFirst rows of training data")
 print(train.head())
 
 
+
+
+
+
+
+
 # 2 Check Missing Values
 print("\nMissing values in training data:")
 missing_train = train.isnull().sum().sort_values(ascending=False)
@@ -27,6 +33,17 @@ print(missing_train[missing_train > 0])
 print("\nMissing values in test data:")
 missing_test = test.isnull().sum().sort_values(ascending=False)
 print(missing_test[missing_test > 0])
+
+missing = test.isnull().sum()
+missing = missing[missing > 0]
+print(missing)
+
+plt.figure(figsize=(12,6))
+sns.heatmap(train.isnull(), cbar=False)
+plt.title("Missing Values Heatmap")
+plt.show()
+
+
 
 
 # 3 Handle Missing Values
@@ -44,7 +61,6 @@ plt.title("Outlier Detection for Y")
 plt.show()
 
 # Optional: remove extreme outliers in y
-
 Q1 = train["y"].quantile(0.25)
 Q3 = train["y"].quantile(0.75)
 IQR = Q3 - Q1
@@ -65,22 +81,91 @@ print("\nFeature matrix shape:", X.shape)
 print("Target vector shape:", y.shape)
 
 
-# 6 Save Cleaned Data
-X.to_csv("clean_1_X_train.csv", index=False)
-y.to_csv("clean_1_y_train.csv", index=False)
-test.to_csv("clean_1_X_test.csv", index=False)
+# 6 Handle Missing Values (Median Imputation)
+print("\nApplying Median Imputation...")
 
-print("\nCleaned datasets saved successfully.")
+y = train["y"]
+X = train.drop("y", axis=1)
 
-
-print(train.info())
-print(train.describe())
+X_median_train = X.fillna(X.median())
+X_median_test = test.fillna(test.median())
 
 
+# 7 Knn Imputation Methods
+from sklearn.impute import KNNImputer
 
-import seaborn as sns
-import matplotlib.pyplot as plt
-plt.figure(figsize=(12,6))
-sns.heatmap(train.isnull(), cbar=False)
-plt.title("Missing Values Heatmap")
-plt.show()
+print("\nApplying KNN Imputation...")
+
+# Separate X and y
+y = train["y"]
+X = train.drop("y", axis=1)
+
+# Apply KNN only to X
+knn_imputer = KNNImputer(n_neighbors=5)
+
+X_knn_train = pd.DataFrame(
+    knn_imputer.fit_transform(X),
+    columns=X.columns
+)
+
+X_knn_test = pd.DataFrame(
+    knn_imputer.transform(test),
+    columns=test.columns
+)
+
+print("KNN imputation completed")
+
+
+
+# 8 Model-Based Imputation Methods
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+print("\nApplying Model-based Imputation...")
+y = train["y"]
+X = train.drop("y", axis=1)
+model_imputer = IterativeImputer(random_state=42)
+X_model_train = pd.DataFrame(
+    model_imputer.fit_transform(X),
+    columns=X.columns
+)
+X_model_test = pd.DataFrame(
+    model_imputer.transform(test),
+    columns=test.columns
+)
+
+
+# Initialize model-based imputer
+model_imputer = IterativeImputer(max_iter=10, random_state=42)
+
+# Apply imputation
+X_model = pd.DataFrame(model_imputer.fit_transform(X), columns=X.columns)
+test_model = pd.DataFrame(model_imputer.transform(test), columns=test.columns)
+train_model = pd.concat([y, X_model], axis=1)
+print("Model-based imputation completed")
+
+
+
+
+
+
+
+
+
+
+
+# Save files
+X_knn_train.to_csv("data/clean_2_knn_train.csv", index=False)
+X_knn_test.to_csv("data/clean_2_knn_test.csv", index=False)
+
+# Save
+X_median_train.to_csv("data/clean_4_median_train.csv", index=False)
+X_median_test.to_csv("data/clean_4_median_test.csv", index=False)
+
+
+
+X_model_train.to_csv("data/clean_3_model_train.csv", index=False)
+X_model_test.to_csv("data/clean_3_model_test.csv", index=False)
+
+
+
+print("All cleaned datasets saved.")
