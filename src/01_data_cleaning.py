@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -9,8 +8,8 @@ import matplotlib.pyplot as plt
 # 1 Load Data
 # Load Data
 
-train = pd.read_csv("data/case1Data.csv")
-test = pd.read_csv("data/case1Data_Xnew.csv")
+train = pd.read_csv("data_clean/case1Data.csv")
+test = pd.read_csv("data_clean/case1Data_Xnew.csv")
 
 print("Train shape:", train.shape)
 print("Test shape:", test.shape)
@@ -47,11 +46,21 @@ plt.show()
 
 
 # 3 Handle Missing Values
-train = train.fillna(train.mean(numeric_only=True))
-test = test.fillna(test.mean(numeric_only=True))
+# Feature / Target split
+X = train.drop("y", axis=1)
+y = train["y"]
+
+# Mean imputation SOLO sulle feature
+X_mean_train = X.fillna(X.mean())
+X_mean_test = test.fillna(test.mean())
+
+# Se vuoi salvare il train con y
+train_mean = pd.concat([y, X_mean_train], axis=1)
 
 print("\nMissing values after cleaning:")
 print(train.isnull().sum().sum())
+
+
 
 
 # 4 Outlier Detection
@@ -150,21 +159,22 @@ print("Model-based imputation completed")
 
 
 
-
+# Save
+X_mean_train.to_csv("data_clean/clean_4_mean_train.csv", index=False)
+X_mean_test.to_csv("data_clean/clean_4_mean_test.csv", index=False)
 
 
 # Save files
-X_knn_train.to_csv("data/clean_2_knn_train.csv", index=False)
-X_knn_test.to_csv("data/clean_2_knn_test.csv", index=False)
+X_knn_train.to_csv("data_clean/clean_2_knn_train.csv", index=False)
+X_knn_test.to_csv("data_clean/clean_2_knn_test.csv", index=False)
 
 # Save
-X_median_train.to_csv("data/clean_4_median_train.csv", index=False)
-X_median_test.to_csv("data/clean_4_median_test.csv", index=False)
+X_median_train.to_csv("data_clean/clean_1_median_train.csv", index=False)
+X_median_test.to_csv("data_clean/clean_1_median_test.csv", index=False)
 
 
-
-X_model_train.to_csv("data/clean_3_model_train.csv", index=False)
-X_model_test.to_csv("data/clean_3_model_test.csv", index=False)
+X_model_train.to_csv("data_clean/clean_3_model_train.csv", index=False)
+X_model_test.to_csv("data_clean/clean_3_model_test.csv", index=False)
 
 
 
